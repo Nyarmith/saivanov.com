@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html><head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style id="dark-background-light-text-add-on-inline-style-override"></style></head>
+    <body>
+
+
+
+      <div id="header">
+        <div id="nav">
+		      <a href="index.html">Index</a> 
+          <a href="projects.html">Projects</a> 
+          <a href="stats.html">Stats</a>
+          <a href="fun.html">Fun</a> 
+        </div>
+      </div>
+
+      <div id="page-wrap">
+
+        <div class="page" id="page1">
+          <div class="page-padding"></div>
+          <a name="who"></a>
+          <canvas id="canv1" class="bgCanv" width=1000 height=960></canvas>
+          <div class="over">
+            <h1>Who</h1>
+            <p>Hi, I'm Sergey (call me "Serge"). Welcome to my site!</p>
+            <!-- server waving? -->
+            <!--<img id="profpic" src="./pic.jpg"> </img>-->
+            <p>I'm a computer science graduate from PSU and luckily I enjoy what I do.</p>
+            <!--<img id="mathpic" src="./matho.png"> </img>-->
+            <!-- lifting math or something (math as work in 2d)  -->
+            <p>I currently work in the greater Northern-Virginia area, flexing my system-programming muscles at <a href="https://en.wikipedia.org/wiki/Society_for_Worldwide_Interbank_Financial_Telecommunication">[SWIFT]</a>.</p>
+
+            <p>I like real, rigorous mathematics. Though I only have minors in statistics and mathematics, I spend some of my time studying new topics and <a href="blog">[writing about them]</a> as I learn.</p>
+            <p><br/><br/>&nbsp; &nbsp; &#x2193;</p>
+            <!-- if small resolution show scroll-down option -->
+          </div>
+        </div>
+
+        <div class="page" id="page2">
+          <div class="page-padding"></div>
+          <a name="what"></a>
+          <canvas id="canv2" class="bgCanv" width=1000 height=960></canvas>
+          <div class="over">
+            <h1>What</h1>
+            <p>I'm an experienced developer. I've  developed desktop applications, browser plugins, servers, windows apps, and sleek terminal-CLIs. Professionally, I have developed heavy duty software targetting Linux, Windows, RHEL, SunOS, AIX and HP-UX.</p>
+            <!-- diagram of 2d source to many destination/platform thing> -->
+            <p>
+            Most of my professional experience has consisted of stepping into existing projects and refactoring them. It's a pretty language-invariant process.</p>
+            <!-- image of 2d bricks thing> -->
+            <p>
+            A project may be composed of a monolith, many modules, one or a hundred languages, but there's always a logical intent deduced from coupling, code structures(or the lack thereof).
+            </p>
+            <p><br/><br/>&nbsp; &nbsp; &#x2193;</p>
+          </div>
+        </div>
+
+        <div class="page" id="page3">
+          <div class="page-padding"></div>
+          <a name="how"></a> 
+          <canvas id="canv3" class="bgCanv" width=1000 height=960></canvas>
+          <div class="over">
+            <h1>How</h1>
+            <p>
+            A project's outcome is determined before any keys are typed. Similarly, most of my success comes from 
+            </p>
+            <!-- 2d image of coder sun-tzu -->
+            <p>
+            For actual methodologies, I like to employ Scrum or Agile. Regular prototyping and iteration is key to meeting targets on time, however, knowing when adherence to a practice is weighing you down (not just in the short-term) has to be weighed against any approach.
+            </p>
+            <!-- cartoon of dude sprinting -->
+            <p>
+            I prefer command-line development, but ultimately use whatever is most expedient. For more details on technologies I've touched, check out my <a href="stats">[stats]</a> page.
+            </p>
+            <p><br/><br/>&nbsp; &nbsp; &#x2193;</p>
+          </div>
+        </div>
+
+        <div class="page" id="page4">
+          <div class="page-padding"></div>
+          <a name="conc"></a> 
+          <canvas id="canv4" class="bgCanv" width=1000 height=960></canvas>
+          <div class="over">
+            <h1>What Else?</h1>
+            <p>I've put some info on this site's pages. Explore them to get a better sense of me and what I've  worked on.</p>
+            <p>Oh, and thanks for stopping by!</p>
+          </div>
+        </div>
+
+      </div>
+
+      <script src="jquery.js"></script>
+      <script>$(document).ready(function() {
+function filterPath(string) {
+  return string
+    .replace(/^\//,'')  
+    .replace(/(index|default).[a-zA-Z]{3,4}$/,'')  
+    .replace(/\/$/,'');
+}
+$('a[href*=#]').each(function() {
+  if ( filterPath(location.pathname) == filterPath(this.pathname)
+    && location.hostname == this.hostname
+    && this.hash.replace(/#/,'') ) {
+    var $targetId = $(this.hash), $targetAnchor = $('[name=' + this.hash.slice(1) +']');
+    var $target = $targetId.length ? $targetId : $targetAnchor.length ? $targetAnchor : false;
+    if ($target) {
+      var targetOffset = $target.offset().top;
+      $(this).click(function() {
+        $('html, body').animate({scrollTop: targetOffset}, 2000);
+        return false;
+      });
+    }
+  }
+});
+});</script>
+      <script src="canvCurses.js"></script>
+      <script src="cur.js"> </script>
+
+    </body>
+</html>

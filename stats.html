@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" type="text/css" href="github-calendar-responsive.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style id="dark-background-light-text-add-on-inline-style-override">
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <div id="nav">
+        <a href="index.html">Index</a> 
+        <a href="projects.html">Projects</a> 
+        <a href="stats.html">Stats</a>
+        <a href="fun.html">Fun</a> 
+      </div>
+    </div>
+
+    <div id="page-wrap">
+
+      <div class="page">
+        <a name="about"></a>
+        <div class="page-padding"></div>
+        <p>AHHH</p>
+        <p>Very cool guy, attractive but competent </p>
+        <p>This is what you see on the About page.</p>
+        <p>Since most skills come from actions, and most actions are habit, I try to stay code-fit by maintaining productive habits.</p>
+        <!-- github commit diagram -->
+        <div class="calendar">
+          <img src="https://assets-cdn.github.com/images/spinners/octocat-spinner-128.gif" class="spinner"/>
+          <p class="spinner-text monospace">Crunching <a href="https://github.com/Nyarmith">@Nyarmith</a>'s contributions for you.</p>
+
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/3.0.2/es6-promise.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/0.10.1/fetch.min.js"></script>
+        <script src="github-calendar.min.js"></script>
+        <script>GitHubCalendar(".calendar","Nyarmith");</script>
+      </div>
+
+  </body>
+</html>
