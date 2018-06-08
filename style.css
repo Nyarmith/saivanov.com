@@ -23,8 +23,6 @@ p {
 }
 
 a {
-  font-size: 1.2em;
-  background: rgb(51,51,51);
   color:#92CAF4;
   text-decoration:none;
 }
@@ -56,12 +54,12 @@ a {
 }
 
 #header {
-	position:fixed;
-	top:0px;
-	left:0px;
-	background:rgb(51,51,51); 
-	height:60px; 
-	width:100%;
+  position:fixed;
+  top:0px;
+  left:0px;
+  background:rgb(51,51,51); 
+  height:60px; 
+  width:100%;
   z-index: 10;
 }
 
@@ -69,29 +67,35 @@ a {
 #nav {
   background: rgb(51,51,51);
   font-size:1.2em;
-	margin-left:35px;
-	margin-top:25px;
-	word-spacing:20px;
+  margin-left:35px;
+  margin-top:25px;
+  word-spacing:20px;
+}
+
+#nav a{
+  background: rgb(51,51,51);
+  font-weight: 550;
 }
 
 .page{
   position: relative;
-	width:959px;
-	height:910px;
-	padding-top:30px;
+  width:959px;
+  height:910px;
+  padding-top:30px;
 }
-	
+
 #page1 {
 	background:#afc9ff;
 }
-	
+
 #page2 {
 	background:#777cdc;
-	}
-	
+}
+
 #page3 {
 	background:#9b70c0;
-	}
+}
+
 #page4 {
 	background:#bb209c;
   height:620px;
@@ -110,5 +114,10 @@ a {
 	
 .page-padding {height:40px; width:100%;}
 
+.downArrow {font-size: 1.4em; }
+
+.equipment { margin: 10px 30px 10px 30px; font-size: 1.2em; width:100%; }
+.stats { margin: 10px 30px 10px 30px; font-size: 1.3em; }
+#fst { width : 70px; }
 	
 /*a:hover { text-decoration:underline;}*/
