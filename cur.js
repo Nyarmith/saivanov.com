@@ -1,3 +1,27 @@
+
+function demo1(cobj){
+    //demo that just prints out code? I can't do highlighting so probably not...
+    //sure, let's try it with some basic highlighting, let's take the revision-based approach
+}
+
+function demo2(cobj){
+    //demo that showcases rotating cubes
+    //demo that showcases rotating cubes
+}
+
+function demo3(cobj){
+    //either...
+    //interactive demo based on mouse movements
+    //or
+    //demo based on drops coming form colliding objects
+    //or
+    //something period and harmonious
+}
+
+function demo4(cobj){
+    //amiga bouncing ball demo
+}
+
 window.onload = function(){
     //each obj = 8px wide, 12px high
     var cursObj = Cursify("canv1",120,70);//,"Courier New",8);
