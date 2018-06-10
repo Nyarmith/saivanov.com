@@ -151,8 +151,10 @@ var RootWindowFuncs = {
      'nextline': (function() {
         this.x = 0;
         this.y++;
-        if (this.y >= this.height)
+        if (this.y >= this.height){
             this.y = 0;
+            this.nextPage=true;
+        }
      }),
 
     /**
@@ -161,6 +163,11 @@ var RootWindowFuncs = {
      * nextline() function.
      */
     'addch': (function(char) {
+        if (char == '\n'){
+            this.nextline();
+          return 0;
+        }
+
         this.set_ch(char, this.x, this.y);
 
         this.x++;
@@ -282,6 +289,7 @@ var RootWindowFuncs = {
             for (var col = 0; col < this.width; col++)
                 RootWindowFuncs.clear_cell.apply(this, [col, row]);
         }
+        this.nextPage = false;
     }),
 
     /**
@@ -336,6 +344,7 @@ function RootWindow(canvas, width, height, font, font_size) {
     self.height = height;
     self.x = 0;
     self.y = 0;
+    self.nextPage=false;
 
     self.aspect_x = canvas.width / width;
     self.aspect_y = canvas.height / height;
@@ -403,6 +412,11 @@ var SubwindowFuncs = {
     }),
 
     'addch': (function(char) {
+        if (char == '\n'){
+            this.nextline();
+          return 0;
+        }
+
         this.set_ch(char, this.x, this.y);
 
         this.x++;

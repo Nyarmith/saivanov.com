@@ -50,6 +50,8 @@ li {
 
 .over{
   margin-top : 120px;
+  margin-left: 10px;
+  margin-right: 10px;
   position:absolute;
   width: min(100vw,1070);
   /*flex-shrink: 1;*/
@@ -58,7 +60,10 @@ li {
   top:0px;
   left:0px;
   z-index:5;
-  padding:10px;
+  background: rgba(30,30,30,.10);
+}
+.over *{
+  background: rgba(30,30,30,.10);
 }
 
 .shrink { margin: 0 20px 0 20px; }
