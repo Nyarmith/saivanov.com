@@ -162,6 +162,7 @@ async function demo1(cobj,width,height,strngz){
 
 // ==== DEMO2 BEGIN ====
 var CubeRot = [1,1];
+var Center  = [450,450];
 
 function draw2Dline(cursObj,x1,y1,x2,y2,c){
   deltax = Math.abs(x2 - x1);        // The difference between the x's
@@ -225,12 +226,9 @@ function draw2Dline(cursObj,x1,y1,x2,y2,c){
   }
 }
 
-function draw3Dline(cursObj,x1,y1,z1,x2,y2,z2,center,c){
+function draw3Dline(cursObj,a,b,rot){
   var xRot = CubeRot[0];
   var yRot = CubeRot[1];
-  var xCenter = center[0];
-  var yCenter = center[1];
-  var zCenter = 70;
   var scrX1 = 0;
   var scrY1 = 0;
   var scrX2 = 0;
@@ -244,25 +242,61 @@ function draw3Dline(cursObj,x1,y1,z1,x2,y2,z2,center,c){
   var rotZ2 = 0;
 
   // 3D rotation:
-
-  rotX1 = -x1 * Math.sin(xRot) + y1 * Math.cos(xRot)
-  rotY1 = -x1 * Math.cos(xRot) * Math.sin(yRot) - y1 * Math.sin(xRot) * Math.sin(yRot) - z1 * Math.cos(yRot) //+ p
-  rotZ1 = -x1 * Math.cos(xRot) * Math.cos(yRot) - y1 * Math.sin(xRot) * Math.cos(yRot) + z1 * Math.sin(yRot)
-  rotX2 = -x2 * Math.sin(xRot) + y2 * Math.cos(xRot)
-  rotY2 = -x2 * Math.cos(xRot) * Math.sin(yRot) - y2 * Math.sin(xRot) * Math.sin(yRot) - z2 * Math.cos(yRot) //+ p
-  rotZ2 = -x2 * Math.cos(xRot) * Math.cos(yRot) - y2 * Math.sin(xRot) * Math.cos(yRot) + z2 * Math.sin(yRot)
+  let u = rot.mul(a);
+  let v = rot.mul(b);
 
   // Convert to 2D line:
 
-  scrX1 = Math.round(256 * (rotX1 / (rotZ1 + zCenter)) + xCenter);
-  scrY1 = Math.round(256 * (rotY1 / (rotZ1 + zCenter)) + yCenter);
-  scrX2 = Math.round(256 * (rotX2 / (rotZ2 + zCenter)) + xCenter);
-  scrY2 = Math.round(256 * (rotY2 / (rotZ2 + zCenter)) + yCenter);
+  scrX1 = Math.round(u.data[0] + Center[0]);
+  scrY1 = Math.round(u.data[1] + Center[1]);
+  scrX2 = Math.round(v.data[0] + Center[0]);
+  scrY2 = Math.round(v.data[1] + Center[1]);
 
   /// ...and draw it!
   draw2Dline(cursObj,scrX1,scrY1,scrX2,scrY2);
 }
 
+var cubeMesh = [
+vec3.create( 1, 1, 1),
+vec3.create( 1, 1,-1),
+vec3.create( 1,-1, 1),
+vec3.create( 1,-1,-1),
+vec3.create(-1, 1, 1),
+vec3.create(-1, 1,-1),
+vec3.create(-1,-1, 1),
+vec3.create(-1,-1,-1),
+]
+
+var cubeInds = [
+0,1,
+0,2,
+0,4,
+3,1,
+3,2,
+3,7,
+6,2,
+6,4,
+6,7,
+5,4,
+5,1,
+5,7,
+]
+
+var tetraHedronMesh = [
+vec3.create( 1, 1, 0),
+vec3.create(-1, 1, 0),
+vec3.create( 0,-1,-1),
+vec3.create( 0,-1, 1),
+]
+
+var tetraHedronInds = [
+0,1,
+0,2,
+0,3,
+1,2,
+1,3,
+2,3,
+]
 
 async function demo2(cobj,width,height){
     cobj.clear();
@@ -272,66 +306,41 @@ async function demo2(cobj,width,height){
   //orientation: z-axis = towards you, y-axis = up, x-axis = right
 
   var sleeptime=70;
-  var center = [Math.round(width/2), Math.round(height/2)];
-  var innerR = Math.min(width,height)/12*3/5;
-  var outerR = Math.max(width,height)/12;
+  Center = [Math.round(width/2), Math.round(height/2)];
+  //var innerR = Math.min(width,height)/4.5;
+  //var outerR = Math.max(width,height)/3.3;
+  var innerR = Math.min(width,height)/4.5;
+  var outerR = Math.max(width,height)/3.35;
   //var middleR = innerR*.6 + outerR*.4;
   while(true){
+    CubeRot[0] += 1.71; //x-rot
+    CubeRot[1] += 2.29;  //y-rot
     cobj.clear();
-    CubeRot[0] += .03;
-    CubeRot[1] += .04;
-    draw3Dline(cobj,-outerR,outerR,outerR,outerR,outerR,outerR,center,1)
-    draw3Dline(cobj,outerR,-outerR,outerR,outerR,outerR,outerR,center,1)
-    draw3Dline(cobj,outerR,outerR,-outerR,outerR,outerR,outerR,center,1)
-    draw3Dline(cobj,-outerR,-outerR,outerR,-outerR,outerR,outerR,center,1)
-    draw3Dline(cobj,-outerR,outerR,-outerR,-outerR,outerR,outerR,center,1)
-    draw3Dline(cobj,-outerR,-outerR,outerR,outerR,-outerR,outerR,center,1)
-    draw3Dline(cobj,-outerR,outerR,-outerR,outerR,outerR,-outerR,center,1)
-    draw3Dline(cobj,-outerR,-outerR,-outerR,outerR,-outerR,-outerR,center,1)
-    draw3Dline(cobj,-outerR,-outerR,-outerR,-outerR,outerR,-outerR,center,1)
-    draw3Dline(cobj,outerR,-outerR,-outerR,outerR,-outerR,outerR,center,1)
-    draw3Dline(cobj,outerR,-outerR,-outerR,outerR,outerR,-outerR,center,1)
-    draw3Dline(cobj,-outerR,-outerR,-outerR,-outerR,-outerR,outerR,center,1)
+    let rotation1  = Mat.rotx(CubeRot[0]);
+    rotation1 = rotation1.mul(Mat.roty(CubeRot[1]));
+    rotation1 = rotation1.mul(Mat.scale(innerR,innerR,innerR));
 
     CubeRot[0] *= innerR/outerR;
     CubeRot[1] *= innerR/outerR;
 
-    draw3Dline(cobj,-innerR,innerR,innerR,innerR,innerR,innerR,center,1)
-    draw3Dline(cobj,innerR,-innerR,innerR,innerR,innerR,innerR,center,1)
-    draw3Dline(cobj,innerR,innerR,-innerR,innerR,innerR,innerR,center,1)
-    draw3Dline(cobj,-innerR,-innerR,innerR,-innerR,innerR,innerR,center,1)
-    draw3Dline(cobj,-innerR,innerR,-innerR,-innerR,innerR,innerR,center,1)
-    draw3Dline(cobj,-innerR,-innerR,innerR,innerR,-innerR,innerR,center,1)
-    draw3Dline(cobj,-innerR,innerR,-innerR,innerR,innerR,-innerR,center,1)
-    draw3Dline(cobj,-innerR,-innerR,-innerR,innerR,-innerR,-innerR,center,1)
-    draw3Dline(cobj,-innerR,-innerR,-innerR,-innerR,innerR,-innerR,center,1)
-    draw3Dline(cobj,innerR,-innerR,-innerR,innerR,-innerR,innerR,center,1)
-    draw3Dline(cobj,innerR,-innerR,-innerR,innerR,innerR,-innerR,center,1)
-    draw3Dline(cobj,-innerR,-innerR,-innerR,-innerR,-innerR,innerR,center,1)
+    for (let i=0; i<tetraHedronInds.length; i+=2){
+        let a = tetraHedronMesh[tetraHedronInds[i]];
+        let b = tetraHedronMesh[tetraHedronInds[i+1]];
+        draw3Dline(cobj,a,b,rotation1);
+    }
+
+    let rotation2  = Mat.rotx(CubeRot[0]);
+    rotation2 = rotation2.mul(Mat.roty(CubeRot[1]));
+    rotation2 = rotation2.mul(Mat.scale(outerR,outerR,outerR));
 
     CubeRot[0] *= outerR/innerR;
     CubeRot[1] *= outerR/innerR;
 
-    /*
-    CubeRot[0] *= middleR/innerR;
-    CubeRot[1] *= middleR/innerR;
-
-    draw3Dline(cobj,-middleR,middleR,middleR,middleR,middleR,middleR,center,1)
-    draw3Dline(cobj,middleR,-middleR,middleR,middleR,middleR,middleR,center,1)
-    draw3Dline(cobj,middleR,middleR,-middleR,middleR,middleR,middleR,center,1)
-    draw3Dline(cobj,-middleR,-middleR,middleR,-middleR,middleR,middleR,center,1)
-    draw3Dline(cobj,-middleR,middleR,-middleR,-middleR,middleR,middleR,center,1)
-    draw3Dline(cobj,-middleR,-middleR,middleR,middleR,-middleR,middleR,center,1)
-    draw3Dline(cobj,-middleR,middleR,-middleR,middleR,middleR,-middleR,center,1)
-    draw3Dline(cobj,-middleR,-middleR,-middleR,middleR,-middleR,-middleR,center,1)
-    draw3Dline(cobj,-middleR,-middleR,-middleR,-middleR,middleR,-middleR,center,1)
-    draw3Dline(cobj,middleR,-middleR,-middleR,middleR,-middleR,middleR,center,1)
-    draw3Dline(cobj,middleR,-middleR,-middleR,middleR,middleR,-middleR,center,1)
-    draw3Dline(cobj,-middleR,-middleR,-middleR,-middleR,-middleR,middleR,center,1)
-
-    CubeRot[0] *= outerR/middleR;
-    CubeRot[1] *= outerR/middleR;
-    */
+    for (let i=0; i<cubeInds.length; i+=2){
+        let a = cubeMesh[cubeInds[i]];
+        let b = cubeMesh[cubeInds[i+1]];
+        draw3Dline(cobj,a,b,rotation2);
+    }
 
     cobj.refresh();
     await sleep(sleeptime);
