@@ -213,7 +213,8 @@ function draw2Dline(cursObj,x1,y1,x2,y2,c){
 
   for (curpixel = 0; curpixel <= numpixels; curpixel++)
   {
-    cursObj.mvaddch(y,x,'%');      // Draw the current pixel
+    //cursObj.mvaddch(y,x,String.fromCharCode(9829));      // Draw the current pixel
+    cursObj.mvaddch(y,x,'-');      // Draw the current pixel
     num += numadd;              // Increase the numerator by the top of the fraction
     if (num >= den)             // Check if numerator >= denominator
     {
@@ -247,10 +248,10 @@ function draw3Dline(cursObj,a,b,rot){
 
   // Convert to 2D line:
 
-  scrX1 = Math.round(u.data[0] + Center[0]);
-  scrY1 = Math.round(u.data[1] + Center[1]);
-  scrX2 = Math.round(v.data[0] + Center[0]);
-  scrY2 = Math.round(v.data[1] + Center[1]);
+  scrX1 = Math.round(u.data[0]*1.5 + Center[0]);
+  scrY1 = Math.round(u.data[1]     + Center[1]);
+  scrX2 = Math.round(v.data[0]*1.5 + Center[0]);
+  scrY2 = Math.round(v.data[1]     + Center[1]);
 
   /// ...and draw it!
   draw2Dline(cursObj,scrX1,scrY1,scrX2,scrY2);
@@ -305,16 +306,17 @@ async function demo2(cobj,width,height){
   //we can cheat here, since we're using cubes we only need to define radius and rotations for each cube
   //orientation: z-axis = towards you, y-axis = up, x-axis = right
 
-  var sleeptime=70;
+  var sleeptime = 50;
+  //var hls=['#34E2E2','#FFFF33','#FF4C4C','#885EAD','#879eb0'];
   Center = [Math.round(width/2), Math.round(height/2)];
   //var innerR = Math.min(width,height)/4.5;
   //var outerR = Math.max(width,height)/3.3;
   var innerR = Math.min(width,height)/4.5;
-  var outerR = Math.max(width,height)/3.35;
+  var outerR = Math.max(width,height)/3.65;
   //var middleR = innerR*.6 + outerR*.4;
   while(true){
-    CubeRot[0] += 1.71; //x-rot
-    CubeRot[1] += 2.29;  //y-rot
+    CubeRot[0] += 2; //x-rot
+    CubeRot[1] += 3;  //y-rot
     cobj.clear();
     let rotation1  = Mat.rotx(CubeRot[0]);
     rotation1 = rotation1.mul(Mat.roty(CubeRot[1]));
@@ -323,13 +325,14 @@ async function demo2(cobj,width,height){
     CubeRot[0] *= innerR/outerR;
     CubeRot[1] *= innerR/outerR;
 
+    //cobj.set_fg(hls[2]);
     for (let i=0; i<tetraHedronInds.length; i+=2){
         let a = tetraHedronMesh[tetraHedronInds[i]];
         let b = tetraHedronMesh[tetraHedronInds[i+1]];
         draw3Dline(cobj,a,b,rotation1);
     }
 
-    let rotation2  = Mat.rotx(CubeRot[0]);
+    let rotation2  = Mat.rotx(-(CubeRot[0]/.65));
     rotation2 = rotation2.mul(Mat.roty(CubeRot[1]));
     rotation2 = rotation2.mul(Mat.scale(outerR,outerR,outerR));
 
