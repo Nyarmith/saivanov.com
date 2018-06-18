@@ -350,6 +350,26 @@ async function demo2(cobj,width,height){
   }
 }
 
+function drawCircle(cobj,radius, row, col){
+    let r=radius;
+    let r2=r*r;
+    //solve for coords and draw
+    for (let x=r; x>=-r; --x){
+        let t = Math.sqrt(r2-x*x);
+        let y1 = Math.round(t+row);
+        let y2 = Math.round(row-t);
+        let u = Math.round(col+x);
+        cobj.mvaddch(y1, u, '%');
+        cobj.mvaddch(y2, u, '%');
+    }
+}
+
+function Quake(y,x){
+    this.y = y;
+    this.x = x;
+    this.radius = 0;
+}
+
 async function demo3(cobj,width,height){
   //either...
   //interactive demo based on mouse movements
@@ -357,47 +377,57 @@ async function demo3(cobj,width,height){
   //demo based on drops coming form colliding objects
   //or
   //something period and harmonious
+
+  cobj.clear();
+  var sleeptime = 200;
+  let frameNum = 0;
+  let spawnTime = 200;
+  let quakes = [];
+
+  while(true){
+    cobj.refresh();
+    ++frameNum;
+    if (frameNum > spawnTime){
+      frameNum = 0;
+      let y = (Math.random() * height);
+      let x = (Math.random() * width);
+      quakes.push(new Quake(y,x));
+    }
+    for (let i=0; i<quakes.length; ++i){
+      q = quakes[i];
+      drawCircle(cobj,q.radius,q.y,q.x);
+      q.radius++;
+    }
+    cobj.refresh();
+    await sleep(sleeptime);
+    cobj.clear();
+  }
 }
 
 async function demo4(cobj,width,height){
   //amiga bouncing ball demo
+  //raytrace ball
+  //ball diameter = 1/4 screen
+  //color based on x-position of ball and relative-y to top of ball
+  //Shadown in bg
+  //illussory static background(illusory perspective)
+}
+
+//this way we only have one await callback
+async function runDemos(cobj1, cojb2, cojb3, cojb4){
 }
 
 window.onload = function(){
   //each obj = 8px wide, 12px high
-  var cursObj = Cursify("canv1",120,70);//,"Courier New",8);
-  /*
-  cursObj.move(1,1);
-  cursObj.addstr("8888888888 aycdefg help me pls! to");
-  cursObj.mvaddstr(2,1,"aeyou aeyou Aeyou");
-  cursObj.set_fg("rgb(200,150,50)");
-  cursObj.set_bg("rgb(20,50,50)");
-  cursObj.mvaddstr(3,1,"ahhhyAu aeyou Aeyou");
-  cursObj.mvaddstr(5,2,"ahhhyAu aeyou Aeyou");
-  cursObj.set_fg("rgb(190,190,190)");
-  cursObj.set_bg("rgb(30,30,30)");
-  cursObj.mvaddstr(6,3,"pls to HELP aeyou Aeyou");
-  cursObj.set_fg("rgb(190,150,50)");
-  cursObj.set_bg("rgb(20,50,50)");
-  cursObj.mvaddstr(7,4,"ERROR -- ERROR -- ERROR -- AHHHH aeyou Aeyou");
-  cursObj.set_fg("rgb(200,100,100)");
-  cursObj.set_bg("rgb(80,80,80)");
-  cursObj.mvaddstr(11,6,"CALL ADMINISTRATOR %%@@!@# CANNyaT COMPUTE");
-  cursObj.refresh();
-  */
-  demo1(cursObj,700,700,[pstr1,pstr2]);
+  var co1 = Cursify("canv1",120,70);//,"Courier New",8);
+  demo1(co1,700,700,[pstr1,pstr2]);
   var co2 = Cursify("canv2",120,70);
-  demo2(co2,120,70);
+  var ww2 = new Worker(demo2(co2,120,70));
   var co3 = Cursify("canv3",120,70);
-  co3.move(1,1);
-  co3.addstr("asdjojaoidijsaioajdijsioikojo");
-  co3.refresh();
+  var ww3 = new Worker(demo3(co3,120,70));
   var co4 = Cursify("canv4",120,45); co4.move(1,1);
-  co4.addstr("..!celebration..");
-  co4.set_fg("rgb(200,100,100)");
-  co4.set_bg("rgb(80,80,80)");
-  co4.mvaddstr(3,4, "-- SUCCESS -- ERRCODE 0x9FA23B44");
-  co4.refresh();
+  var ww4 = new Worker(demo4(co3,120,70));
+  //TODO: Combine these all into one runDemo function so you can get only one wait() timer(async is biggest time-sink)
 };
 
 var pstr1 = `
