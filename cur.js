@@ -404,6 +404,29 @@ async function demo3(cobj,width,height){
   }
 }
 
+
+functino circleCol(x, rely, r){
+  //figure out which quarter I'm in
+}
+
+function drawSphere(cobj, y, x, radius){
+  for (let y_s=y-radius; y_s < y+radius; ++y_s){
+    for (let x_s=x-radius; x_s < x+radius; ++x_s){
+      if (x_s*x_s + y_s*y_s <= radius){ //am I in the circle?
+        //what color amd I drawing
+        cobj.set_bg(circleCol(x,y_s-(y-radius),radius));
+        cobj.mvaddch(y,x,' ');
+      }
+    }
+  }
+}
+
+//TODO: Optimize this
+function drawBG(cobj, H, W){
+}
+
+var bpos=[];
+var bvel=[-2.5,2.5];
 async function demo4(cobj,width,height){
   //amiga bouncing ball demo
   //raytrace ball
@@ -411,6 +434,32 @@ async function demo4(cobj,width,height){
   //color based on x-position of ball and relative-y to top of ball
   //Shadown in bg
   //illussory static background(illusory perspective)
+  bpos = [Math.round(height/2), Math.round(width/x)];
+  let radius = Math.round((width+height)/4);
+  let sleeptime=50;
+  while(true){
+    cobj.refresh();
+
+    drawBG(cobj, width, height);
+
+    let nextPos = [bpos[0] + bvel[0], bpos[1] + bvel[1]]
+
+    //y bounce?
+    if (nextPos[0] - radius < 0 || nextPos[0] + radius > height){
+      bvel[0] = -bvel[0];
+      nextPos[0] = bpos[0] + bvel[0];
+    }
+
+    //x bounce?
+    if (nextPos[1] - radius < 0 || nextPos[1] + radius > width){
+      bvel[1] = -bvel[1];
+      nextPos[1] = bpos[1] + bvel[1];
+    }
+
+    drawSphere(cobj, bpos[0], bpos[1], radius);
+
+    await sleep(50);
+  }
 }
 
 //this way we only have one await callback
