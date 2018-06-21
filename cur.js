@@ -405,20 +405,26 @@ async function demo3(cobj,width,height){
 }
 
 
-functino circleCol(x, rely, r){
+function circleCol(x, y, rely, r){
   //figure out which quarter I'm in
+  return ('#F00');
 }
 
 function drawSphere(cobj, y, x, radius){
-  for (let y_s=y-radius; y_s < y+radius; ++y_s){
-    for (let x_s=x-radius; x_s < x+radius; ++x_s){
-      if (x_s*x_s + y_s*y_s <= radius){ //am I in the circle?
+  for (let y_s=y-radius; y_s<=y+radius; ++y_s){
+    for (let x_s=x-radius; x_s<=x+radius; ++x_s){
+      if (((x-x_s)*(x-x_s) + (y-y_s)*(y-y_s)) < radius*radius){ //am I in the circle?
         //what color amd I drawing
-        cobj.set_bg(circleCol(x,y_s-(y-radius),radius));
-        cobj.mvaddch(y,x,' ');
+        cobj.set_fg(circleCol(x, y, y_s-(y-radius), radius));
+        cobj.set_bg(circleCol(x, y, y_s-(y-radius), radius));
+        cobj.mvaddch(y_s,x_s,'.');
       }
     }
   }
+
+  cobj.set_fg('rgb(30,30,30)');
+  cobj.set_bg('rgb(30,30,30)');
+
 }
 
 //TODO: Optimize this
@@ -426,7 +432,7 @@ function drawBG(cobj, H, W){
 }
 
 var bpos=[];
-var bvel=[-2.5,2.5];
+var bvel=[-1,1];
 async function demo4(cobj,width,height){
   //amiga bouncing ball demo
   //raytrace ball
@@ -434,11 +440,10 @@ async function demo4(cobj,width,height){
   //color based on x-position of ball and relative-y to top of ball
   //Shadown in bg
   //illussory static background(illusory perspective)
-  bpos = [Math.round(height/2), Math.round(width/x)];
-  let radius = Math.round((width+height)/4);
+  bpos = [Math.round(height/2), Math.round(width/2)];
+  let radius = 12 //Math.round((width+height)/10.75);
   let sleeptime=50;
   while(true){
-    cobj.refresh();
 
     drawBG(cobj, width, height);
 
@@ -456,9 +461,13 @@ async function demo4(cobj,width,height){
       nextPos[1] = bpos[1] + bvel[1];
     }
 
-    drawSphere(cobj, bpos[0], bpos[1], radius);
+    bpos = nextPos;
 
+    drawSphere(cobj, Math.round(bpos[0]), Math.round(bpos[1]), radius);
+
+    cobj.refresh();
     await sleep(50);
+    cobj.clear();
   }
 }
 
@@ -475,7 +484,7 @@ window.onload = function(){
   var co3 = Cursify("canv3",120,70);
   var ww3 = new Worker(demo3(co3,120,70));
   var co4 = Cursify("canv4",120,45); co4.move(1,1);
-  var ww4 = new Worker(demo4(co3,120,70));
+  var ww4 = new Worker(demo4(co4,120,45));
   //TODO: Combine these all into one runDemo function so you can get only one wait() timer(async is biggest time-sink)
 };
 
