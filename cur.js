@@ -350,7 +350,7 @@ async function demo2(cobj,width,height){
   }
 }
 
-function drawCircle(cobj,radius, row, col){
+function drawCircle(cobj,radius, row, col, theta){
     let r=radius;
     let r2=r*r;
     //solve for coords and draw
@@ -398,6 +398,7 @@ async function demo3(cobj,width,height){
       drawCircle(cobj,q.radius,q.y,q.x);
       q.radius++;
     }
+
     cobj.refresh();
     await sleep(sleeptime);
     cobj.clear();
@@ -407,7 +408,35 @@ async function demo3(cobj,width,height){
 
 function circleCol(x, y, rely, r){
   //figure out which quarter I'm in
-  return ('#F00');
+  //
+  //there are 4 quarters
+  let q=Math.round((r/2));
+
+  //which y quarter am I in?
+  let yq = Math.round(rely/q);
+  let xq = Math.round(x/q);
+  if (yq <= q){
+    //start white from right
+    if (x % 2 == 1)
+      return ("#F00");
+    return ("#FFF");
+
+  } else if (yq <= 2*q){
+    //start red from right
+    if (x % 2 == 1)
+      return ("#FFF");
+    return ("#F00");
+  } else if (yq <= 3*q){
+    //start white from right
+    if (x % 2 == 1)
+      return ("#F00");
+    return ("#FFF");
+  } else {
+    //start red from right
+    if (x % 2 == 1)
+      return ("#FFF");
+    return ('#F00');
+  }
 }
 
 function drawSphere(cobj, y, x, radius){
