@@ -354,20 +354,23 @@ function drawCircle(cobj,radius, row, col){
     let r=radius;
     let r2=r*r;
     //solve for coords and draw
-    for (let x=r; x>=-r; --x){
-        let t = Math.sqrt(r2-x*x);
-        let y1 = Math.round(t+row);
-        let y2 = Math.round(row-t);
-        let u = Math.round(col+x);
-        cobj.mvaddch(y1, u, '%');
-        cobj.mvaddch(y2, u, '%');
+    for (let x=r; x>=0; --x){
+        let t  = Math.sqrt(r2-x*x);
+        let y1 = Math.floor(t+row);
+        let y2 = Math.floor(row-t);
+        let x1 = Math.floor(col+x*1.5);
+        let x2 = Math.floor(col-x*1.5);
+        cobj.mvaddch(y1, x1, '%');
+        cobj.mvaddch(y2, x1, '%');
+        cobj.mvaddch(y1, x2, '%');
+        cobj.mvaddch(y2, x2, '%');
     }
 }
 
 function Quake(y,x){
     this.y = y;
     this.x = x;
-    this.radius = 0;
+    this.radius = 1;
 }
 
 async function demo3(cobj,width,height){
@@ -379,9 +382,9 @@ async function demo3(cobj,width,height){
   //something period and harmonious
 
   cobj.clear();
-  var sleeptime = 200;
-  let frameNum = 0;
-  let spawnTime = 200;
+  var sleeptime = 50;
+  let frameNum = 20;
+  let spawnTime = 30;
   let quakes = [];
 
   while(true){
@@ -389,14 +392,18 @@ async function demo3(cobj,width,height){
     ++frameNum;
     if (frameNum > spawnTime){
       frameNum = 0;
-      let y = (Math.random() * height);
-      let x = (Math.random() * width);
+      let r = Math.floor(Math.random() * height * width);
+      y = r / height;
+      x = r % height;
       quakes.push(new Quake(y,x));
     }
     for (let i=0; i<quakes.length; ++i){
       q = quakes[i];
       drawCircle(cobj,q.radius,q.y,q.x);
-      q.radius++;
+      q.radius+=1.75;
+      if (q.radius > 4*width){
+        delete q;
+      }
     }
 
     cobj.refresh();
@@ -409,7 +416,7 @@ function CoolSphere(pos, rad, tilt){
   this.position = pos;
   this.radius = rad;
   this.tilt=tilt;
-  this.xrot=0;
+  this.xrot=5*Math.PI/4;
 }
 
 //given coordinates on sphere, get normal
@@ -418,11 +425,11 @@ CoolSphere.prototype.getNormal = function(coord){
 }
 
 //returns distance of intersectin
-CoolSphere.prototype.Intersect = function(eye, dir){
+CoolSphere.prototype.Intersect = function(campos, dir){
   let SPHERE_EPSILON = .000000000000001;
-  let z = vec3.subtract(this.position,eye);
-  let d = vec3.dot(v,dir);
-  let closest_dist = vec3.subtract(vec3.scale(z,d),this.position);
+  let z = vec3.subtract(this.position,campos);
+  let d = vec3.dot(z,dir);
+  let closest_dist = vec3.subtract(vec3.add(campos,vec3.scale(dir,d)),this.position);
   let D2 = vec3.dot(closest_dist, closest_dist);
   let R2 = this.radius*this.radius;
   if (D2 > R2)
@@ -432,18 +439,19 @@ CoolSphere.prototype.Intersect = function(eye, dir){
   let D=Math.sqrt(R2 - D2);
 
   //find actual point of collission
-  let u = vec3.add(closest_dist, vec3.scale(dir,-D);
+  let u = vec3.add(closest_dist, vec3.scale(dir,-D));
 
   //do a change of bases
-  //TODO
+  u = vec3.normalize(this.tilt.mul(u));
 
   //now convert this new vector to radians for x and y
+
   let a = Math.acos(u.data[0]);
   let b = Math.acos(u.data[1]);
   a += this.xrot;
   //get color
-  let mod = (Math.floor(a/(Math.PI/4))%2) + (Math.floor(b/(Math.PI/4))%2);
-  if mod==1
+  let mod = (Math.floor(a/(Math.PI/4))%2) ^ (Math.floor(b/(Math.PI/4))%2);
+  if (mod==1)
     return "#F00";
   else
     return "#FFF";
@@ -454,15 +462,15 @@ var csphere;
 function drawSphere(cobj, py, px, radius){
   let pos = vec3.create(0,0,2);
   let dir = vec3.create(0,0,-1); //pos will change but dir will be the same
-  for (let x=px-radius; x<pr+radius; ++x){
-    for (let y=py-radius; y<pr+radius; ++y){
+  for (let x=px-radius; x<px+radius; ++x){
+    for (let y=py-radius; y<py+radius; ++y){
       pos.data[0] = x+.5;
       pos.data[1] = y+.5;
       let col=csphere.Intersect(pos,dir);
       if (col != -1){
         cobj.set_fg(col);
         cobj.set_bg(col);
-        cojb.mvaddch(y,x,',');
+        cobj.mvaddch(y,x,',');
       }
     }
   }
@@ -474,7 +482,7 @@ function drawBG(cobj, H, W){
 }
 
 var bpos=[];
-var bvel=[-1,1];
+var bvel=[1,-1];
 async function demo4(cobj,width,height){
   //amiga bouncing ball demo
   //raytrace ball
@@ -482,37 +490,39 @@ async function demo4(cobj,width,height){
   //color based on x-position of ball and relative-y to top of ball
   //Shadown in bg
   //illussory static background(illusory perspective)
-  bpos = [Math.round(height/2), Math.round(width/2)];
-  let radius = 12 //Math.round((width+height)/10.75);
+  bpos = [Math.round(width/2), Math.round(height/2)];
+  let radius = 15 //Math.round((width+height)/10.75);
   let sleeptime=50;
-  let rotV = .033;
-  csphere = new CoolSphere(vec3.create(bpos[1],bos[0],-20),9,-.25);
+  let rotV = .053;
+  csphere = new CoolSphere(vec3.create(bpos[0],bpos[1],-20),radius,Mat.rotz(-15));
   while(true){
 
     drawBG(cobj, width, height);
 
-    let nextPos = [csphere.data[1] + bvel[0], csphere.data[0] + bvel[1]]
+    let nextPos = [csphere.position.data[0] + bvel[0], csphere.position.data[1] + bvel[1]];
 
     //y bounce?
-    if (nextPos[0] - radius < 0 || nextPos[0] + radius > height){
-      bvel[0] = -bvel[0];
-      nextPos[0] = bpos[0] + bvel[0];
+    let buf=1;
+    if (nextPos[1] - radius < 0 || nextPos[1] + radius > height){
+      bvel[1] = -bvel[1];
+      nextPos[1] = csphere.position.data[1] + bvel[1];
     }
 
     //x bounce?
-    if (nextPos[1] - radius < 0 || nextPos[1] + radius > width){
-      bvel[1] = -bvel[1];
-      nextPos[1] = bpos[1] + bvel[1];
+    if (nextPos[0] - radius < 0 || nextPos[0] + radius > width){
+      bvel[0] = -bvel[0];
+      nextPos[0] = csphere.position.data[0] + bvel[0];
       rotV = -rotV;
     }
 
-    bpos = nextPos;
+    csphere.position.data[0] = nextPos[0];
+    csphere.position.data[1] = nextPos[1];
 
-    drawSphere(cobj, Math.round(bpos[0]), Math.round(bpos[1]), radius);
+    drawSphere(cobj, Math.floor(nextPos[1]), Math.floor(nextPos[0]), radius);
     csphere.xrot += rotV;
-    if (csphere.xrot > 2*Math.PI){
-      csphere.xrot -= 2*Math.PI);
-    }
+
+    //if (csphere.xrot > 2*Math.PI)
+      //csphere.xrot -= 2*Math.PI;
 
     cobj.refresh();
     await sleep(50);
@@ -532,8 +542,8 @@ window.onload = function(){
   var ww2 = new Worker(demo2(co2,120,70));
   var co3 = Cursify("canv3",120,70);
   var ww3 = new Worker(demo3(co3,120,70));
-  var co4 = Cursify("canv4",120,45); co4.move(1,1);
-  var ww4 = new Worker(demo4(co4,120,45));
+  var co4 = Cursify("canv4",120,55); co4.move(1,1);
+  var ww4 = new Worker(demo4(co4,120,55));
   //TODO: Combine these all into one runDemo function so you can get only one wait() timer(async is biggest time-sink)
 };
 
