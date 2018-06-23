@@ -288,7 +288,7 @@ vec3.cross = function(a,b){
 }
 
 vec3.scale = function(a,s){
-  return a.scale(s);
+  return vec3.create(a.data[0]*s, a.data[1]*s, a.data[2]*s);
 }
 
 vec3.multiply = function(a,b){

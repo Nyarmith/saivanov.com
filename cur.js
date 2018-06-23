@@ -350,7 +350,7 @@ async function demo2(cobj,width,height){
   }
 }
 
-function drawCircle(cobj,radius, row, col, theta){
+function drawCircle(cobj,radius, row, col){
     let r=radius;
     let r2=r*r;
     //solve for coords and draw
@@ -405,58 +405,71 @@ async function demo3(cobj,width,height){
   }
 }
 
-
-function circleCol(x, y, rely, r){
-  //figure out which quarter I'm in
-  //
-  //there are 4 quarters
-  let q=Math.round((r/2));
-
-  //which y quarter am I in?
-  let yq = Math.round(rely/q);
-  let xq = Math.round(x/q);
-  if (yq <= q){
-    //start white from right
-    if (x % 2 == 1)
-      return ("#F00");
-    return ("#FFF");
-
-  } else if (yq <= 2*q){
-    //start red from right
-    if (x % 2 == 1)
-      return ("#FFF");
-    return ("#F00");
-  } else if (yq <= 3*q){
-    //start white from right
-    if (x % 2 == 1)
-      return ("#F00");
-    return ("#FFF");
-  } else {
-    //start red from right
-    if (x % 2 == 1)
-      return ("#FFF");
-    return ('#F00');
-  }
+function CoolSphere(pos, rad, tilt){
+  this.position = pos;
+  this.radius = rad;
+  this.tilt=tilt;
+  this.xrot=0;
 }
 
-function drawSphere(cobj, y, x, radius){
-  for (let y_s=y-radius; y_s<=y+radius; ++y_s){
-    for (let x_s=x-radius; x_s<=x+radius; ++x_s){
-      if (((x-x_s)*(x-x_s) + (y-y_s)*(y-y_s)) < radius*radius){ //am I in the circle?
-        //what color amd I drawing
-        cobj.set_fg(circleCol(x, y, y_s-(y-radius), radius));
-        cobj.set_bg(circleCol(x, y, y_s-(y-radius), radius));
-        cobj.mvaddch(y_s,x_s,'.');
+//given coordinates on sphere, get normal
+CoolSphere.prototype.getNormal = function(coord){
+  return ((coord - this.position)/this.radius);
+}
+
+//returns distance of intersectin
+CoolSphere.prototype.Intersect = function(eye, dir){
+  let SPHERE_EPSILON = .000000000000001;
+  let z = vec3.subtract(this.position,eye);
+  let d = vec3.dot(v,dir);
+  let closest_dist = vec3.subtract(vec3.scale(z,d),this.position);
+  let D2 = vec3.dot(closest_dist, closest_dist);
+  let R2 = this.radius*this.radius;
+  if (D2 > R2)
+    return -1;
+
+  //now solve for actual point
+  let D=Math.sqrt(R2 - D2);
+
+  //find actual point of collission
+  let u = vec3.add(closest_dist, vec3.scale(dir,-D);
+
+  //do a change of bases
+  //TODO
+
+  //now convert this new vector to radians for x and y
+  let a = Math.acos(u.data[0]);
+  let b = Math.acos(u.data[1]);
+  a += this.xrot;
+  //get color
+  let mod = (Math.floor(a/(Math.PI/4))%2) + (Math.floor(b/(Math.PI/4))%2);
+  if mod==1
+    return "#F00";
+  else
+    return "#FFF";
+}
+
+var csphere;
+
+function drawSphere(cobj, py, px, radius){
+  let pos = vec3.create(0,0,2);
+  let dir = vec3.create(0,0,-1); //pos will change but dir will be the same
+  for (let x=px-radius; x<pr+radius; ++x){
+    for (let y=py-radius; y<pr+radius; ++y){
+      pos.data[0] = x+.5;
+      pos.data[1] = y+.5;
+      let col=csphere.Intersect(pos,dir);
+      if (col != -1){
+        cobj.set_fg(col);
+        cobj.set_bg(col);
+        cojb.mvaddch(y,x,',');
       }
     }
   }
-
   cobj.set_fg('rgb(30,30,30)');
   cobj.set_bg('rgb(30,30,30)');
-
 }
 
-//TODO: Optimize this
 function drawBG(cobj, H, W){
 }
 
@@ -472,11 +485,13 @@ async function demo4(cobj,width,height){
   bpos = [Math.round(height/2), Math.round(width/2)];
   let radius = 12 //Math.round((width+height)/10.75);
   let sleeptime=50;
+  let rotV = .033;
+  csphere = new CoolSphere(vec3.create(bpos[1],bos[0],-20),9,-.25);
   while(true){
 
     drawBG(cobj, width, height);
 
-    let nextPos = [bpos[0] + bvel[0], bpos[1] + bvel[1]]
+    let nextPos = [csphere.data[1] + bvel[0], csphere.data[0] + bvel[1]]
 
     //y bounce?
     if (nextPos[0] - radius < 0 || nextPos[0] + radius > height){
@@ -488,11 +503,16 @@ async function demo4(cobj,width,height){
     if (nextPos[1] - radius < 0 || nextPos[1] + radius > width){
       bvel[1] = -bvel[1];
       nextPos[1] = bpos[1] + bvel[1];
+      rotV = -rotV;
     }
 
     bpos = nextPos;
 
     drawSphere(cobj, Math.round(bpos[0]), Math.round(bpos[1]), radius);
+    csphere.xrot += rotV;
+    if (csphere.xrot > 2*Math.PI){
+      csphere.xrot -= 2*Math.PI);
+    }
 
     cobj.refresh();
     await sleep(50);
