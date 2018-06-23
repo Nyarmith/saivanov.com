@@ -204,12 +204,12 @@ var RootWindowFuncs = {
      * Gets the character at the given location, or if the coordinate is
      * invalid, this returns the empty string instead.
      */
-    'getch': (function(cx, cy) {
-        if (!this.in_window())
+    'getch': (function(cy, cx) {
+        if (!this.in_window(cx,cy))
             return '';
 
         var index = this.index(cx, cy);
-        return this.char_memory[index];
+        return [this.char_memory[index], this.color_memory[index].foreground, this.color_memory[index].background];
     }),
 
     /**
@@ -429,7 +429,7 @@ var SubwindowFuncs = {
             this.addch(str[i]);
     }),
 
-    'getch': (function(cx, cy) {
+    'getch': (function(cy, cx) {
         if (!this.in_window(cx, cy))
             return '';
 

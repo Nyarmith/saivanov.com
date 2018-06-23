@@ -211,7 +211,17 @@ function draw2Dline(cursObj,x1,y1,x2,y2,c){
     numpixels = deltay;         // There are more y-values than x-values
   }
 
-  for (curpixel = 0; curpixel <= numpixels; curpixel++)
+  num += numadd;              // Increase the numerator by the top of the fraction
+  if (num >= den)             // Check if numerator >= denominator
+  {
+    num -= den;               // Calculate the new numerator value
+    x += xinc1;               // Change the x as appropriate
+    y += yinc1;               // Change the y as appropriate
+  }
+  x += xinc2;                 // Change the x as appropriate
+  y += yinc2;                 // Change the y as appropriate
+
+  for (curpixel = 1; curpixel < numpixels; curpixel++)
   {
     //cursObj.mvaddch(y,x,String.fromCharCode(9829));      // Draw the current pixel
     cursObj.mvaddch(y,x,'-');      // Draw the current pixel
@@ -258,49 +268,49 @@ function draw3Dline(cursObj,a,b,rot){
 }
 
 var cubeMesh = [
-vec3.create( 1, 1, 1),
-vec3.create( 1, 1,-1),
-vec3.create( 1,-1, 1),
-vec3.create( 1,-1,-1),
-vec3.create(-1, 1, 1),
-vec3.create(-1, 1,-1),
-vec3.create(-1,-1, 1),
-vec3.create(-1,-1,-1),
+  vec3.create( 1, 1, 1),
+  vec3.create( 1, 1,-1),
+  vec3.create( 1,-1, 1),
+  vec3.create( 1,-1,-1),
+  vec3.create(-1, 1, 1),
+  vec3.create(-1, 1,-1),
+  vec3.create(-1,-1, 1),
+  vec3.create(-1,-1,-1),
 ]
 
 var cubeInds = [
-0,1,
-0,2,
-0,4,
-3,1,
-3,2,
-3,7,
-6,2,
-6,4,
-6,7,
-5,4,
-5,1,
-5,7,
+  0,1,
+  0,2,
+  0,4,
+  3,1,
+  3,2,
+  3,7,
+  6,2,
+  6,4,
+  6,7,
+  5,4,
+  5,1,
+  5,7,
 ]
 
 var tetraHedronMesh = [
-vec3.create( 1, 1, 0),
-vec3.create(-1, 1, 0),
-vec3.create( 0,-1,-1),
-vec3.create( 0,-1, 1),
+  vec3.create( 1, 1, 0),
+  vec3.create(-1, 1, 0),
+  vec3.create( 0,-1,-1),
+  vec3.create( 0,-1, 1),
 ]
 
 var tetraHedronInds = [
-0,1,
-0,2,
-0,3,
-1,2,
-1,3,
-2,3,
+  0,1,
+  0,2,
+  0,3,
+  1,2,
+  1,3,
+  2,3,
 ]
 
 async function demo2(cobj,width,height){
-    cobj.clear();
+  cobj.clear();
   //demo that showcases rotating cubes
   //base the inner circle around the max height(slightly smaller),and the inner circle around min(width,height,max(width,height)*3/5
   //we can cheat here, since we're using cubes we only need to define radius and rotations for each cube
@@ -327,9 +337,9 @@ async function demo2(cobj,width,height){
 
     //cobj.set_fg(hls[2]);
     for (let i=0; i<tetraHedronInds.length; i+=2){
-        let a = tetraHedronMesh[tetraHedronInds[i]];
-        let b = tetraHedronMesh[tetraHedronInds[i+1]];
-        draw3Dline(cobj,a,b,rotation1);
+      let a = tetraHedronMesh[tetraHedronInds[i]];
+      let b = tetraHedronMesh[tetraHedronInds[i+1]];
+      draw3Dline(cobj,a,b,rotation1);
     }
 
     let rotation2  = Mat.rotx(-(CubeRot[0]/.65));
@@ -340,9 +350,9 @@ async function demo2(cobj,width,height){
     CubeRot[1] *= outerR/innerR;
 
     for (let i=0; i<cubeInds.length; i+=2){
-        let a = cubeMesh[cubeInds[i]];
-        let b = cubeMesh[cubeInds[i+1]];
-        draw3Dline(cobj,a,b,rotation2);
+      let a = cubeMesh[cubeInds[i]];
+      let b = cubeMesh[cubeInds[i+1]];
+      draw3Dline(cobj,a,b,rotation2);
     }
 
     cobj.refresh();
@@ -350,43 +360,178 @@ async function demo2(cobj,width,height){
   }
 }
 
-function drawCircle(cobj,radius, row, col){
-    let r=radius;
-    let r2=r*r;
-    //solve for coords and draw
-    for (let x=r; x>=0; --x){
-        let t  = Math.sqrt(r2-x*x);
-        let y1 = Math.floor(t+row);
-        let y2 = Math.floor(row-t);
-        let x1 = Math.floor(col+x*1.5);
-        let x2 = Math.floor(col-x*1.5);
-        cobj.mvaddch(y1, x1, '%');
-        cobj.mvaddch(y2, x1, '%');
-        cobj.mvaddch(y1, x2, '%');
-        cobj.mvaddch(y2, x2, '%');
+function nextCol(c){
+  switch(c){
+    case 'rgb(140,140,140)':
+      return 'rgb(100,100,256)';
+    case 'rgb(100,100,256)':
+      return 'rgb(256,230,140)';
+    case 'rgb(256,230,140)':
+      return 'rgb(236,247,118)';
+    case 'rgb(236,247,118)':
+      return 'rgb(250,80,80)';
+    case 'rgb(250,80,80)':
+      return 'rgb(50,255,15)';
+  }
+}
+
+function addQch(cobj,y,x){
+  let c = cobj.getch(y,x);
+  if (c[0] == '' || c[0] == undefined){
+    cobj.set_fg('rgb(140,140,140');
+  } else if (c[0] == ' '){
+    cobj.set_fg('rgb(140,140,140)');
+  } else {
+    cobj.set_fg(nextCol(c[1]));
+  }
+  cobj.mvaddch(y, x, '%');
+}
+
+function cool2Dline(cursObj,y1,x1,y2,x2){
+  deltax = Math.abs(x2 - x1);        // The difference between the x's
+  deltay = Math.abs(y2 - y1);        // The difference between the y's
+  x = x1;                       // Start x off at the first pixel
+  y = y1;                       // Start y off at the first pixel
+
+  if (x2 >= x1)                 // The x-values are increasing
+  {
+    xinc1 = 1;
+    xinc2 = 1;
+  }
+  else                          // The x-values are decreasing
+  {
+    xinc1 = -1;
+    xinc2 = -1
+  }
+
+  if (y2 >= y1)                 // The y-values are increasing
+  {
+    yinc1 = 1;
+    yinc2 = 1;
+  }
+  else                          // The y-values are decreasing
+  {
+    yinc1 = -1;
+    yinc2 = -1;
+  }
+
+  if (deltax >= deltay)         // There is at least one x-value for every y-value
+  {
+    xinc1 = 0;                  // Don't change the x when numerator >= denominator
+    yinc2 = 0;                  // Don't change the y for every iteration
+    den = deltax;
+    num = deltax / 2;
+    numadd = deltay;
+    numpixels = deltax;         // There are more x-values than y-values
+  }
+  else                          // There is at least one y-value for every x-value
+  {
+    xinc2 = 0;                  // Don't change the x for every iteration
+    yinc1 = 0;                  // Don't change the y when numerator >= denominator
+    den = deltay;
+    num = deltay / 2;
+    numadd = deltax;
+    numpixels = deltay;         // There are more y-values than x-values
+  }
+
+  for (curpixel = 0; curpixel <= numpixels; curpixel++)
+  {
+    //cursObj.mvaddch(y,x,String.fromCharCode(9829));      // Draw the current pixel
+    addQch(cursObj,y,x);      // Draw the current pixel
+    num += numadd;              // Increase the numerator by the top of the fraction
+    if (num >= den)             // Check if numerator >= denominator
+    {
+      num -= den;               // Calculate the new numerator value
+      x += xinc1;               // Change the x as appropriate
+      y += yinc1;               // Change the y as appropriate
+    } else {
+      x += xinc2;                 // Change the x as appropriate
+      y += yinc2;                 // Change the y as appropriate
     }
+  }
+}
+
+var sins = [];
+var coss = [];
+for (var i=Math.PI/36; i<=Math.PI/2; i+=Math.PI/36){
+	sins.push(Math.sin(i));
+	coss.push(Math.cos(i));
+}
+
+//new approach with sampling
+function drawCircle(cobj,radius, row, col){
+  let v1 = Math.floor(row+radius);
+  let v2 = Math.floor(row-radius);
+  let u1 = Math.floor(col);
+  let u2 = Math.floor(col);
+  for (var i=0; i<=sins.length; i++){
+    let x = sins[i]*radius;
+    let y = coss[i]*radius;
+
+    let y1 = Math.floor(row + y);
+    let y2 = Math.floor(row - y);
+    let x1 = Math.floor(col + x*1.5);
+    let x2 = Math.floor(col - x*1.5);
+    cool2Dline(cobj,v1,u1,y1,x1);
+    cool2Dline(cobj,v2,u1,y2,x1);
+    cool2Dline(cobj,v1,u2,y1,x2);
+    cool2Dline(cobj,v2,u2,y2,x2);
+    v1 = y1;
+    v2 = y2;
+    u1 = x1;
+    u2 = x2;
+  }
+  cool2Dline(cobj,v1,u2,v2,u2);
+  cool2Dline(cobj,v1,u1,v2,u1);
 }
 
 function Quake(y,x){
-    this.y = y;
-    this.x = x;
-    this.radius = 1;
+  this.y = y;
+  this.x = x;
+  this.radius = 2;
 }
 
-async function demo3(cobj,width,height){
-  //either...
-  //interactive demo based on mouse movements
-  //or
-  //demo based on drops coming form colliding objects
-  //or
-  //something period and harmonious
+function getMousePos(helem, evt){
+  let rect = helem.getBoundingClientRect();
+  return {
+    x : (evt.clientX - rect.left)/8,
+    y : (evt.clientY - rect.top)/12
+  };
+}
 
+async function demo3(cobj,width,height,helem){
   cobj.clear();
   var sleeptime = 50;
   let frameNum = 20;
-  let spawnTime = 30;
+  let spawnTime = 35;
   let quakes = [];
 
+  var lastMove = 0;
+  function newQuake(e){
+    var pos = getMousePos(helem,e);
+    if (Date.now() - lastMove > 550 && pos.y < 900 && pos.y>0 && pos.x > 0 && pos.x < 900){
+      quakes.push(new Quake(pos.y,pos.x));
+      drawCircle(cobj,1,pos.y,pos.x);
+      cobj.refresh();
+      lastMove = Date.now();
+    }
+  }
+
+  function newQuakeTouch(e){
+    var pos = getMousePos(helem,e.changedTouches[0]);
+    if (Date.now() - lastMove > 550 && pos.y < 1000 && pos.y>0 && pos.x > 0 && pos.x < 1000){
+      quakes.push(new Quake(pos.y,pos.x));
+      drawCircle(cobj,1,pos.y,pos.x);
+      cobj.refresh();
+      lastMove = Date.now();
+    }
+  }
+
+  window.addEventListener('mousemove',newQuake, false);
+  window.addEventListener('touchstart',newQuakeTouch, false);
+
+  //add limiter
+  //do mouse scroll
   while(true){
     cobj.refresh();
     ++frameNum;
@@ -400,8 +545,10 @@ async function demo3(cobj,width,height){
     for (let i=0; i<quakes.length; ++i){
       q = quakes[i];
       drawCircle(cobj,q.radius,q.y,q.x);
-      q.radius+=1.75;
-      if (q.radius > 4*width){
+      drawCircle(cobj,q.radius+.5,q.y,q.x);
+      q.radius+=2;
+      if (q.radius > width){
+        quakes.splice(i,1);
         delete q;
       }
     }
@@ -522,7 +669,7 @@ async function demo4(cobj,width,height){
     csphere.xrot += rotV;
 
     //if (csphere.xrot > 2*Math.PI)
-      //csphere.xrot -= 2*Math.PI;
+    //csphere.xrot -= 2*Math.PI;
 
     cobj.refresh();
     await sleep(50);
@@ -541,7 +688,7 @@ window.onload = function(){
   var co2 = Cursify("canv2",120,70);
   var ww2 = new Worker(demo2(co2,120,70));
   var co3 = Cursify("canv3",120,70);
-  var ww3 = new Worker(demo3(co3,120,70));
+  var ww3 = new Worker(demo3(co3,120,70,document.getElementById("canv3")));
   var co4 = Cursify("canv4",120,55); co4.move(1,1);
   var ww4 = new Worker(demo4(co4,120,55));
   //TODO: Combine these all into one runDemo function so you can get only one wait() timer(async is biggest time-sink)
