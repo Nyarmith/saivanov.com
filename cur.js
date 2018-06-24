@@ -511,7 +511,7 @@ async function demo3(cobj,width,height,helem){
   var lastMove = 0;
   function newQuake(e){
     var pos = getMousePos(helem,e);
-    if (Date.now() - lastMove > 550 && pos.y < 900 && pos.y>0 && pos.x > 0 && pos.x < 900){
+    if (Date.now() - lastMove > 550 && pos.y < 840 && pos.y>0 && pos.x > 0 && pos.x < 960){
       quakes.push(new Quake(pos.y,pos.x));
       drawCircle(cobj,1,pos.y,pos.x);
       cobj.refresh();
@@ -521,7 +521,7 @@ async function demo3(cobj,width,height,helem){
 
   function newQuakeTouch(e){
     var pos = getMousePos(helem,e.changedTouches[0]);
-    if (Date.now() - lastMove > 550 && pos.y < 1000 && pos.y>0 && pos.x > 0 && pos.x < 1000){
+    if (Date.now() - lastMove > 550 && pos.y < 840 && pos.y>0 && pos.x > 0 && pos.x < 960){
       quakes.push(new Quake(pos.y,pos.x));
       drawCircle(cobj,1,pos.y,pos.x);
       cobj.refresh();
@@ -692,9 +692,17 @@ async function demo4(cobj,width,height){
   }
 }
 
+function isOffScreen(el){
+  var rect = el.getBoundingClientRect();
+  return ( (rect.x + rect.width) < 0
+        || (rect.y + rect.height) < 0
+        || (rect.x > window.innerWidth || rect.y > window.innerHeight)
+         );
+}
+
 //this way we only have one await callback
 //args = [width, height, other_stuff...]
-async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
+async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4, e1, e2, e3, e4){
   var sleepval=68;
 
   let timer1=1;
@@ -702,6 +710,12 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
   let timer3=1;
   let timer4=0;
   let fnum=0;
+  let fnum2=0;
+
+  var vis1=false;
+  var vis2=false;
+  var vis3=false;
+  var vis4=false;
 
   //demo1 setup
   let ayystate=0;
@@ -734,7 +748,7 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
   let spawnTime = 35;
   let quakes = [];
   let liveQuakes = 0;
-  let quakeLim = Math.floor(3*arg3[0]/4);
+  let quakeLim = Math.floor(2*arg3[0]/3);
   for (let m=0; m<15; ++m){
     quakes.push(new Quake(0,0));
     quakes[m].radius = -1;
@@ -742,7 +756,7 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
   var lastMove = 0;
   function newQuake(e){
     var pos = getMousePos(arg3[2],e);
-    if (liveQuakes < quakes.length && Date.now() - lastMove > 550 && pos.y < 900 && pos.y>0 && pos.x > 0 && pos.x < 900){
+    if (liveQuakes < quakes.length && Date.now() - lastMove > 550 && pos.y < 740 && pos.y>0 && pos.x > 0 && pos.x < 800){
       for (let m=0; m<quakes.length; ++m){
         if (quakes[m].radius == -1){
           quakes[m].y = pos.y;
@@ -760,7 +774,7 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
 
   function newQuakeTouch(e){
     var pos = getMousePos(arg3[2],e.changedTouches[0]);
-    if (liveQuakes < quakes.length && Date.now() - lastMove > 550 && pos.y < 1000 && pos.y>0 && pos.x > 0 && pos.x < 1000){
+    if (liveQuakes < quakes.length && Date.now() - lastMove > 550 && pos.y < 740 && pos.y>0 && pos.x > 0 && pos.x < 800){
       for (let m=0; m<quakes.length; ++m){
         if (quakes[m].radius == -1){
           quakes[m].y = pos.y;
@@ -795,7 +809,7 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
 
     //demo 1
     //which string am I in
-    if (str_itr<=strngz.length){
+    if (vis1 && str_itr<=strngz.length){
       if (wordConsumer.word() !== 'EOF'){
         var cur = wordConsumer.word();
         if (ayystate !== 0){
@@ -871,13 +885,14 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
         cobj1.refresh();
       } else {
         ++str_itr;
-        if (str_itri == strngz.length)
+        if (str_itr == strngz.length)
           str_itr=0;
         strng = strngz[str_itr];
         wordConsumer = new wordCruncher(strng);
       }
     }
 
+    if (vis2){
     if (fnum == timer2){
       //demo 2
       CubeRot[0] += 2; //x-rot
@@ -912,8 +927,10 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
       cobj2.refresh();
       cobj2.empty();
     }
+    }
 
 
+    if (vis3){
     if (fnum == timer3){
       //demo 3
       ++frameNum;
@@ -951,10 +968,11 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
       cobj3.refresh();
       cobj3.empty();
     }
+    }
 
     //demo 4
     
-    if (fnum == timer4){
+    if (vis4 && fnum == timer4){
     cobj4.clear();
     //cobj4.restore();
     //cobj4.save();
@@ -994,6 +1012,15 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
     ++fnum;
     if (fnum > 1)
       fnum = 0;
+    fnum2 += fnum;
+
+    if (fnum2 > 8){
+      vis1 = !isOffScreen(e1);
+      vis2 = !isOffScreen(e2);
+      vis3 = !isOffScreen(e3);
+      vis4 = !isOffScreen(e4);
+      fnum2 = 0;
+    }
 
     var sleepve = sleepval - dt; //Math.floor((dt/100000));
     //==universal refresh==
@@ -1014,7 +1041,11 @@ window.onload = function(){
  // var ww4 = new Worker(demo4(co4,120,55));
  // TODO: Combine these all into one runDemo function so you can get only one wait() timer(async is biggest time-sink)
   
-  var ww = new Worker(runDemos(co1,co2,co3,co4,[120,70,[pstr1,pstr2]],[120,70],[120,70,document.getElementById("canv3")],[120,55]));
+  var e1 = document.getElementById("canv1");
+  var e2 = document.getElementById("canv2");
+  var e3 = document.getElementById("canv3");
+  var e4 = document.getElementById("canv4");
+  var ww = new Worker(runDemos(co1,co2,co3,co4,[120,70,[pstr1,pstr2]],[120,70],[120,70,e3],[120,55],e1,e2,e3,e4));
   //runDemos(co1,co2,co3,co4,[120,70,[pstr1,pstr2]],[120,70],[120,70,document.getElementById("canv3")],[120,55]);
 };
 
