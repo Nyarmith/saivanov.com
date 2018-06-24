@@ -678,20 +678,259 @@ async function demo4(cobj,width,height){
 }
 
 //this way we only have one await callback
-async function runDemos(cobj1, cojb2, cojb3, cojb4){
+//args = [width, height, other_stuff...]
+async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
+  var sleepval=40;
+
+  //demo1 setup
+  var strngz = arg1[2];
+  var keywords1 = ['function','var','{','}','[',']','(',')']; //bright blue
+  var keywords2 = ['while','if','else','elseif']; //yellow
+  var keywords3 = ['document','window','this']; //super red
+  var tknDelims1 = ['\'','\"']; //purp
+  var tknDelims2 = ['//']; //faded blue
+  var tknDelims3 = ['/*','*/']; //faded blue
+  var defb='rgb(30,30,30)';
+  var deff='rgb(140,140,140)';
+  var hls=['#34E2E2','rgb(30,30,30)','#FFFF33','#666600','#FF4C4C','#000000','#885EAD','rgb(30,30,30)','#879eb0','rgb(30,30,30)'];
+  var str_itr=0;
+  var strng = strngz[str_itr];
+  var wordConsumer = new wordCruncher(strng);
+
+  //demo2 setup
+  cobj2.clear();
+  Center = [Math.round(arg2[0]/2), Math.round(arg2[1]/2)];
+  var innerR = Math.min(arg2[0],arg2[1])/4.5;
+  var outerR = Math.max(arg2[0],arg2[1])/3.65;
+
+  //demo3 setup
+  cobj3.clear();
+  let frameNum = 20;
+  let spawnTime = 35;
+  let quakes = [];
+  var lastMove = 0;
+  function newQuake(e){
+    var pos = getMousePos(arg3[2],e);
+    if (Date.now() - lastMove > 550 && pos.y < 900 && pos.y>0 && pos.x > 0 && pos.x < 900){
+      quakes.push(new Quake(pos.y,pos.x));
+      drawCircle(cobj3,1,pos.y,pos.x);
+      cobj3.refresh();
+      lastMove = Date.now();
+    }
+  }
+
+  function newQuakeTouch(e){
+    var pos = getMousePos(arg3[2],e.changedTouches[0]);
+    if (Date.now() - lastMove > 550 && pos.y < 1000 && pos.y>0 && pos.x > 0 && pos.x < 1000){
+      quakes.push(new Quake(pos.y,pos.x));
+      drawCircle(cobj3,1,pos.y,pos.x);
+      cobj3.refresh();
+      lastMove = Date.now();
+    }
+  }
+
+  window.addEventListener('mousemove',newQuake, false);
+  window.addEventListener('touchstart',newQuakeTouch, false);
+  
+  //demo4 setup
+  bpos = [Math.round(arg4[0]/2), Math.round(arg4[1]/2)];
+  let radius = 15 //Math.round((width+height)/10.75);
+  let sleeptime=50;
+  let rotV = .053;
+  csphere = new CoolSphere(vec3.create(bpos[0],bpos[1],-20),radius,Mat.rotz(-15));
+
+  while(true){
+    //which string am I in
+
+    //demo 1
+    if (str_itr<=strngz.length){
+      if (wordConsumer.word() != 'EOF'){
+        var cur = wordConsumer.word();
+        if (keywords1.includes(cur)){
+          cobj1.set_fg(hls[0]);
+          cobj1.set_bg(hls[1]);
+          cobj1.addstr(cur);
+          wordConsumer.next();
+        } else if (keywords2.includes(cur)){
+          cobj1.set_fg(hls[2]);
+          cobj1.set_bg(hls[3]);
+          cobj1.addstr(cur);
+          wordConsumer.next();
+        } else if (keywords3.includes(cur)){
+          cobj1.set_fg(hls[4]);
+          cobj1.set_bg(hls[5]);
+          cobj1.addstr(cur);
+          wordConsumer.next();
+        } else if (tknDelims1.includes(cur)){ //look for same next str delim
+          cobj1.set_fg(hls[6]);
+          cobj1.set_bg(hls[7]);
+          var ayy = cur;
+          cobj1.addstr(ayy);
+          wordConsumer.next();
+          while (wordConsumer.word() != ayy && wordConsumer.word() != 'EOF'){
+            cobj1.addstr(wordConsumer.word());
+            wordConsumer.next();
+            cobj1.refresh();
+            await sleep(sleepval);
+          }
+          cobj1.addstr(wordConsumer.word());  //seen other delim
+          cobj1.refresh();
+          await sleep(sleepval);
+          wordConsumer.next();
+        } else if (tknDelims2.includes(cur)){ //comment
+          cobj1.set_fg(hls[8]);
+          cobj1.set_bg(hls[9]);
+          cobj1.addstr(cur);
+          wordConsumer.next();
+          while (wordConsumer.word() != "\n" && wordConsumer.word != 'EOF'){
+            cobj1.addstr(wordConsumer.word());
+            wordConsumer.next();
+            cobj1.refresh();
+            await sleep(sleepval);
+          }
+        } else if (cur == tknDelims3[0]){
+          cobj1.set_fg(hls[8]);
+          cobj1.set_bg(hls[9]);
+          cobj1.addstr(cur);
+          wordConsumer.next();
+          while (wordConsumer.word() != tknDelims3[1] && wordConsumer.word != 'EOF'){
+            cobj1.addstr(wordConsumer.word());
+            wordConsumer.next();
+            cobj1.refresh();
+            await sleep(sleepval);
+          }
+          cobj1.addstr(wordConsumer.word());
+          wordConsumer.next();
+        }else {  //normal
+          cobj1.set_fg(deff);
+          cobj1.set_bg(defb);
+          cobj1.addstr(cur);
+          wordConsumer.next();
+        }
+        if (cobj1.nextPage == true){
+          cobj1.clear()
+        }
+        cobj1.refresh();
+      } else {
+        ++str_itr;
+        if (str_itri == strngz.length)
+          str_itr=0;
+        strng = strngz[str_itr];
+        wordConsumer = new wordCruncher(strng);
+      }
+    }
+
+    //demo 2
+    CubeRot[0] += 2; //x-rot
+    CubeRot[1] += 3;  //y-rot
+    cobj2.clear();
+    let rotation1  = Mat.rotx(CubeRot[0]);
+    rotation1 = rotation1.mul(Mat.roty(CubeRot[1]));
+    rotation1 = rotation1.mul(Mat.scale(innerR,innerR,innerR));
+
+    CubeRot[0] *= innerR/outerR;
+    CubeRot[1] *= innerR/outerR;
+
+    //cobj.set_fg(hls[2]);
+    for (let i=0; i<tetraHedronInds.length; i+=2){
+      let a = tetraHedronMesh[tetraHedronInds[i]];
+      let b = tetraHedronMesh[tetraHedronInds[i+1]];
+      draw3Dline(cobj2,a,b,rotation1);
+    }
+
+    let rotation2  = Mat.rotx(-(CubeRot[0]/.65));
+    rotation2 = rotation2.mul(Mat.roty(CubeRot[1]));
+    rotation2 = rotation2.mul(Mat.scale(outerR,outerR,outerR));
+
+    CubeRot[0] *= outerR/innerR;
+    CubeRot[1] *= outerR/innerR;
+
+    for (let i=0; i<cubeInds.length; i+=2){
+      let a = cubeMesh[cubeInds[i]];
+      let b = cubeMesh[cubeInds[i+1]];
+      draw3Dline(cobj2,a,b,rotation2);
+    }
+
+    cobj2.refresh();
+
+
+    //demo 3
+    cobj3.clear();
+    ++frameNum;
+    if (frameNum > spawnTime){
+      frameNum = 0;
+      let r = Math.floor(Math.random() * arg3[1] * arg3[0]);
+      y = r / arg3[1];
+      x = r % arg3[1];
+      quakes.push(new Quake(y,x));
+    }
+    for (let i=0; i<quakes.length; ++i){
+      q = quakes[i];
+      drawCircle(cobj3,q.radius,q.y,q.x);
+      drawCircle(cobj3,q.radius+.5,q.y,q.x);
+      q.radius+=2;
+      if (q.radius > arg3[0]){
+        quakes.splice(i,1);
+        delete q;
+      }
+    }
+
+    cobj3.refresh();
+    await sleep(sleeptime);
+
+
+    //demo 4
+    
+    cobj4.clear();
+    drawBG(cobj4, arg4[0], arg4[1]);
+
+    let nextPos = [csphere.position.data[0] + bvel[0], csphere.position.data[1] + bvel[1]];
+
+    //y bounce?
+    let buf=1;
+    if (nextPos[1] - radius < 0 || nextPos[1] + radius > arg4[1]){
+      bvel[1] = -bvel[1];
+      nextPos[1] = csphere.position.data[1] + bvel[1];
+    }
+
+    //x bounce?
+    if (nextPos[0] - radius < 0 || nextPos[0] + radius > arg4[0]){
+      bvel[0] = -bvel[0];
+      nextPos[0] = csphere.position.data[0] + bvel[0];
+      rotV = -rotV;
+    }
+
+    csphere.position.data[0] = nextPos[0];
+    csphere.position.data[1] = nextPos[1];
+
+    drawSphere(cobj4, Math.floor(nextPos[1]), Math.floor(nextPos[0]), radius);
+    csphere.xrot += rotV;
+
+    //if (csphere.xrot > 2*Math.PI)
+    //csphere.xrot -= 2*Math.PI;
+
+    cobj4.refresh();
+
+
+    //==universal refresh==
+    await sleep(sleepval);
+  }
+
 }
 
 window.onload = function(){
   //each obj = 8px wide, 12px high
   var co1 = Cursify("canv1",120,70);//,"Courier New",8);
-  demo1(co1,700,700,[pstr1,pstr2]);
+ // demo1(co1,700,700,[pstr1,pstr2]);
   var co2 = Cursify("canv2",120,70);
-  var ww2 = new Worker(demo2(co2,120,70));
+ // var ww2 = new Worker(demo2(co2,120,70));
   var co3 = Cursify("canv3",120,70);
-  var ww3 = new Worker(demo3(co3,120,70,document.getElementById("canv3")));
+ // var ww3 = new Worker(demo3(co3,120,70,document.getElementById("canv3")));
   var co4 = Cursify("canv4",120,55); co4.move(1,1);
-  var ww4 = new Worker(demo4(co4,120,55));
-  //TODO: Combine these all into one runDemo function so you can get only one wait() timer(async is biggest time-sink)
+ // var ww4 = new Worker(demo4(co4,120,55));
+ // TODO: Combine these all into one runDemo function so you can get only one wait() timer(async is biggest time-sink)
+  
+  var ww = new Worker(runDemos(co1,co2,co3,co4,[120,70,[pstr1,pstr2]],[120,70],[120,70,document.getElementById("canv3")],[120,55]));
 };
 
 var pstr1 = `
