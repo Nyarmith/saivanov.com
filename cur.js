@@ -1,3 +1,4 @@
+//Below is performance tweaking hell, read at your own risk
 function sleep(ms){
   return new Promise(resolve => setTimeout(resolve,ms));
 }
@@ -694,7 +695,7 @@ async function demo4(cobj,width,height){
 //this way we only have one await callback
 //args = [width, height, other_stuff...]
 async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
-  var sleepval=65;
+  var sleepval=68;
 
   let timer1=1;
   let timer2=0;
@@ -733,7 +734,8 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
   let spawnTime = 35;
   let quakes = [];
   let liveQuakes = 0;
-  for (let m=0; m<20; ++m){
+  let quakeLim = Math.floor(3*arg3[0]/4);
+  for (let m=0; m<15; ++m){
     quakes.push(new Quake(0,0));
     quakes[m].radius = -1;
   }
@@ -913,39 +915,41 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4){
 
 
     if (fnum == timer3){
-    //demo 3
-    cobj3.clear();
-    ++frameNum;
-    if (frameNum > spawnTime){
-      frameNum = 0;
-      if (liveQuakes < quakes.length) {
-        let r = Math.floor(Math.random() * arg3[1] * arg3[0]);
-        y = r / arg3[1];
-        x = r % arg3[1];
-        for (let m=0; m<quakes.length; ++m){
-          if (quakes[m].radius == -1){
-            quakes[m].y = y;
-            quakes[m].x = x;
-            quakes[m].radius = 2;
-            break;
+      //demo 3
+      ++frameNum;
+      if (frameNum > spawnTime){
+        frameNum = 0;
+        if (liveQuakes < quakes.length) {
+          let r = Math.floor(Math.random() * arg3[1] * arg3[0]);
+          y = r / arg3[1];
+          x = r % arg3[1];
+          for (let m=0; m<quakes.length; ++m){
+            if (quakes[m].radius == -1){
+              quakes[m].y = y;
+              quakes[m].x = x;
+              quakes[m].radius = 2;
+              break;
+            }
+            ++liveQuakes;
           }
-          ++liveQuakes;
         }
       }
-    }
-    for (let i=0; i<quakes.length; ++i){
-      if (quakes[i].radius > arg3[0]){
-        quakes[i].radius = -1;
-        --liveQuakes;
-      }
-      else if (quakes[i].radius != -1){
-        drawCircle(cobj3,quakes[i].radius,quakes[i].y,quakes[i].x);
-        drawCircle(cobj3,quakes[i].radius+.5,quakes[i].y,quakes[i].x);
-        quakes[i].radius+=2;
-      }
-    }
 
-    cobj3.refresh();
+    } else {
+      for (let i=0; i<quakes.length; ++i){
+        if (quakes[i].radius > quakeLim){
+          quakes[i].radius = -1;
+          --liveQuakes;
+        }
+        else if (quakes[i].radius != -1){
+          drawCircle(cobj3,quakes[i].radius,quakes[i].y,quakes[i].x);
+          drawCircle(cobj3,quakes[i].radius+.5,quakes[i].y,quakes[i].x);
+          quakes[i].radius+=2;
+        }
+      }
+      cobj3.cls();
+      cobj3.refresh();
+      cobj3.empty();
     }
 
     //demo 4

@@ -60,10 +60,10 @@ li {
   top:0px;
   left:0px;
   z-index:5;
-  background: rgba(30,30,30,.10);
+  background: rgba(30,30,30,.20);
 }
 .over *{
-  background: rgba(30,30,30,.10);
+  background: rgba(30,30,30,.20);
 }
 
 .shrink { margin: 0 20px 0 20px; }
@@ -163,6 +163,15 @@ li {
 
 .projSeg h2 a{
     color: #a2b8c5;
+}
+
+.friendlist{
+  margin-top 8px;
+}
+
+.friendlist li{
+  display: inline;
+  margin-left: 8px;
 }
 
 .equipment { margin: 10px 30px 10px 30px; font-size: 1.2em; width:100%; }
