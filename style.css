@@ -32,7 +32,7 @@ h2 {
 
 p {
   font-size: 1.7em;
-  margin-top:.8rem;
+  padding-top:.8rem;
 }
 
 a {
@@ -117,6 +117,10 @@ li {
 	background:#afc9ff;
 }
 
+#page1 div *{
+    background: rgba(30,30,30,.42);
+}
+
 #page2 {
 	background:#777cdc;
 }
@@ -148,7 +152,7 @@ li {
 	
 .page-padding {height:40px; width:100%;}
 
-.downArrow {font-size: 1.4em; color: #f4bc92;}
+.downArrow {font-size: 2.8em; color: #f4bc92; margin-top: .8rem; }
 
 .projSeg{
     margin: 10px 30px 15px 30px;
@@ -174,7 +178,7 @@ li {
   margin-left: 8px;
 }
 
-.equipment { margin: 10px 30px 10px 30px; font-size: 1.2em; width:100%; }
+.equipment { margin: 10px 30px 10px 30px; font-size: 1.2em; width:85%; }
 .stats { margin: 10px 30px 10px 30px; font-size: 1.3em; }
 #fst { width : 70px; }
 	
