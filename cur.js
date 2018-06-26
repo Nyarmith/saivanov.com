@@ -466,6 +466,7 @@ function drawCircle(cobj,radius, row, col){
   let v2 = Math.floor(row-radius);
   let u1 = Math.floor(col);
   let u2 = Math.floor(col);
+  let F = function(x,y){ return cobj.in_window(x,y); };
   for (var i=0; i<=sins.length; i++){
     let x = sins[i]*radius;
     let y = coss[i]*radius;
@@ -474,17 +475,24 @@ function drawCircle(cobj,radius, row, col){
     let y2 = Math.floor(row - y);
     let x1 = Math.floor(col + x*1.5);
     let x2 = Math.floor(col - x*1.5);
-    cool2Dline(cobj,v1,u1,y1,x1);
-    cool2Dline(cobj,v2,u1,y2,x1);
-    cool2Dline(cobj,v1,u2,y1,x2);
-    cool2Dline(cobj,v2,u2,y2,x2);
+    //has this improved performance? I have no idea. TODO: Add benchmarks, then get serious about shading demo4.
+    if (F(u1,v1) || F(x1,y1))
+      cool2Dline(cobj,v1,u1,y1,x1);
+    if (F(u1,v2) || F(x1,y2))
+      cool2Dline(cobj,v2,u1,y2,x1);
+    if (F(u2,v1) || F(x2,y1))
+      cool2Dline(cobj,v1,u2,y1,x2);
+    if (F(u2,v2) || F(x2,y2))
+      cool2Dline(cobj,v2,u2,y2,x2);
     v1 = y1;
     v2 = y2;
     u1 = x1;
     u2 = x2;
   }
-  cool2Dline(cobj,v1,u2,v2,u2);
-  cool2Dline(cobj,v1,u1,v2,u1);
+  if (F(u2,v1) || F(u2,v2))
+    cool2Dline(cobj,v1,u2,v2,u2);
+  if (F(u1,v1) || F(u1,v2))
+    cool2Dline(cobj,v1,u1,v2,u1);
 }
 
 function Quake(y,x){
@@ -505,7 +513,7 @@ async function demo3(cobj,width,height,helem){
   cobj.clear();
   var sleeptime = 50;
   let frameNum = 20;
-  let spawnTime = 35;
+  let spawnTime = 38;
   let quakes = [];
 
   var lastMove = 0;
@@ -749,7 +757,7 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4, e1, 
   let quakes = [];
   let liveQuakes = 0;
   let quakeLim = Math.floor(2*arg3[0]/3);
-  for (let m=0; m<7; ++m){
+  for (let m=0; m<6; ++m){
     quakes.push(new Quake(0,0));
     quakes[m].radius = -1;
   }
@@ -768,7 +776,7 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4, e1, 
 
 
   function handleQuakeMove(e){
-    var pos = getMousePos(arg3[2],e.changedTouches[0]);
+    var pos = getMousePos(arg3[2],e);
     if (liveQuakes < quakes.length && Date.now() - lastMove > 550){
       for (let m=0; m<quakes.length; ++m){
         if (quakes[m].radius == -1){
@@ -788,6 +796,24 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4, e1, 
 
   function handleQuakeTouch(e){
     var pos = getMousePos(arg3[2],e.changedTouches[0]);
+    if (liveQuakes < quakes.length && Date.now() - lastMove > 550){
+      for (let m=0; m<quakes.length; ++m){
+        if (quakes[m].radius == -1){
+          quakes[m].y = pos.y;
+          quakes[m].x = pos.x;
+          quakes[m].radius = 1
+          break;
+        }
+      }
+      ++liveQuakes;
+      drawCircle(cobj3,1,pos.y,pos.x);
+      cobj3.refresh();
+      lastMove = Date.now();
+    }
+  }
+
+  function ballShadeHandler(e){
+    var pos = getMousePos(arg3[3],e);
     if (liveQuakes < quakes.length && Date.now() - lastMove > 550){
       for (let m=0; m<quakes.length; ++m){
         if (quakes[m].radius == -1){
