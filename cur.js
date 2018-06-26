@@ -749,49 +749,11 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4, e1, 
   let quakes = [];
   let liveQuakes = 0;
   let quakeLim = Math.floor(2*arg3[0]/3);
-  for (let m=0; m<15; ++m){
+  for (let m=0; m<7; ++m){
     quakes.push(new Quake(0,0));
     quakes[m].radius = -1;
   }
   var lastMove = 0;
-  function newQuake(e){
-    var pos = getMousePos(arg3[2],e);
-    if (liveQuakes < quakes.length && Date.now() - lastMove > 550 && pos.y < 740 && pos.y>0 && pos.x > 0 && pos.x < 800){
-      for (let m=0; m<quakes.length; ++m){
-        if (quakes[m].radius == -1){
-          quakes[m].y = pos.y;
-          quakes[m].x = pos.x;
-          quakes[m].radius = 1
-          break;
-        }
-      }
-      ++liveQuakes;
-      drawCircle(cobj3,1,pos.y,pos.x);
-      cobj3.refresh();
-      lastMove = Date.now();
-    }
-  }
-
-  function newQuakeTouch(e){
-    var pos = getMousePos(arg3[2],e.changedTouches[0]);
-    if (liveQuakes < quakes.length && Date.now() - lastMove > 550 && pos.y < 740 && pos.y>0 && pos.x > 0 && pos.x < 800){
-      for (let m=0; m<quakes.length; ++m){
-        if (quakes[m].radius == -1){
-          quakes[m].y = pos.y;
-          quakes[m].x = pos.x;
-          quakes[m].radius = 1
-          break;
-        }
-      }
-      ++liveQuakes;
-      drawCircle(cobj3,1,pos.y,pos.x);
-      cobj3.refresh();
-      lastMove = Date.now();
-    }
-  }
-
-  window.addEventListener('mousemove',newQuake, false);
-  window.addEventListener('touchstart',newQuakeTouch, false);
   
   //demo4 setup
   cobj4.refresh();
@@ -804,7 +766,51 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4, e1, 
   let rotV = .053;
   csphere = new CoolSphere(vec3.create(bpos[0],bpos[1],-20),radius,Mat.rotz(-15));
 
+
+  function handleQuakeMove(e){
+    var pos = getMousePos(arg3[2],e.changedTouches[0]);
+    if (liveQuakes < quakes.length && Date.now() - lastMove > 550){
+      for (let m=0; m<quakes.length; ++m){
+        if (quakes[m].radius == -1){
+          quakes[m].y = pos.y;
+          quakes[m].x = pos.x;
+          quakes[m].radius = 1
+          break;
+        }
+      }
+      ++liveQuakes;
+      drawCircle(cobj3,1,pos.y,pos.x);
+      cobj3.refresh();
+      lastMove = Date.now();
+    }
+  }
+
+
+  function handleQuakeTouch(e){
+    var pos = getMousePos(arg3[2],e.changedTouches[0]);
+    if (liveQuakes < quakes.length && Date.now() - lastMove > 550){
+      for (let m=0; m<quakes.length; ++m){
+        if (quakes[m].radius == -1){
+          quakes[m].y = pos.y;
+          quakes[m].x = pos.x;
+          quakes[m].radius = 1
+          break;
+        }
+      }
+      ++liveQuakes;
+      drawCircle(cobj3,1,pos.y,pos.x);
+      cobj3.refresh();
+      lastMove = Date.now();
+    }
+  }
+
+  e3.addEventListener('mousemove',handleQuakeMove, false);
+  e3.addEventListener('touchstart',handleQuakeTouch, false);
+  //e4.addEventListener('mousemove',mouseMoveHandler, false);
+  //e4.addEventListener('touchstart',screenTouchHandler, false);
+
   var oldDate = new Date();
+
   while(true){
 
     //demo 1
