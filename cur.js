@@ -796,7 +796,7 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4, e1, 
 
   function handleQuakeTouch(e){
     var pos = getMousePos(arg3[2],e.changedTouches[0]);
-    if (liveQuakes < quakes.length && Date.now() - lastMove > 550){
+    if (liveQuakes < quakes.length && Date.now() - lastMove > 520){
       for (let m=0; m<quakes.length; ++m){
         if (quakes[m].radius == -1){
           quakes[m].y = pos.y;
@@ -814,7 +814,7 @@ async function runDemos(cobj1, cobj2, cobj3, cobj4, arg1, arg2, arg3, arg4, e1, 
 
   function ballShadeHandler(e){
     var pos = getMousePos(arg3[3],e);
-    if (liveQuakes < quakes.length && Date.now() - lastMove > 550){
+    if (liveQuakes < quakes.length && Date.now() - lastMove > 520){
       for (let m=0; m<quakes.length; ++m){
         if (quakes[m].radius == -1){
           quakes[m].y = pos.y;
@@ -1078,7 +1078,7 @@ window.onload = function(){
   var e3 = document.getElementById("canv3");
   var e4 = document.getElementById("canv4");
   var ww = new Worker(runDemos(co1,co2,co3,co4,[120,70,[pstr1,pstr2]],[120,70],[120,70,e3],[120,55],e1,e2,e3,e4));
-  //runDemos(co1,co2,co3,co4,[120,70,[pstr1,pstr2]],[120,70],[120,70,document.getElementById("canv3")],[120,55]);
+  //runDemos(co1,co2,co3,co4,[120,70,[pstr1,pstr2]],[120,70],[120,70,e3],[120,55],e1,e2,e3,e4);
 };
 
 var pstr1 = `
